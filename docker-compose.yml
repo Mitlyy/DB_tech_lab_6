@@ -1,0 +1,29 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: lab6-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  model:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.model
+    container_name: lab6-model
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+    working_dir: /work
+    volumes:
+      - ./:/work
+    depends_on:
+      - redis
+    command: ["bash", "-lc", "tail -f /dev/null"]
+
+volumes:
+  redis_data:
+
